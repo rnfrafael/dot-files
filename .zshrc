@@ -7,6 +7,12 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+. "$HOME/.asdf/asdf.sh"
+# append completions to fpath
+fpath=(${ASDF_DIR}/completions $fpath)
+# initialise completions with ZSH's compinit
+autoload -Uz compinit && compinit
+
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
@@ -68,7 +74,9 @@ alias dexeca="docker exec -it"
 
 # Editor-related aliases
 alias codez="code ~/.zshrc"
-alias nvz="nvz ~/.zshrc"
+alias nvz="nvim ~/.zshrc"
+alias nvconf="nvim ~/.config/nvim/init.vim"
+alias nvcoc="nvim ~/.config/nvim/coc-settings.json"
 
 # Directory-related aliases
 alias winwww="cd /mnt/c/www"
@@ -79,6 +87,11 @@ alias ll="ls -l"
 alias la="ls -a"
 alias lla="ls -la"
 alias ls="ls --color=auto"
+
+# nvim aliases with asdf package
+alias update-nvim-stable='asdf uninstall neovim stable && asdf install neovim stable'
+alias update-nvim-nightly='asdf uninstall neovim nightly && asdf install neovim nightly'
+alias update-nvim-master='asdf uninstall neovim ref:master && asdf install neovim ref:master'
 
 ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(/mnt/c)
 # fnm
