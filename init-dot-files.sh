@@ -4,6 +4,7 @@ sudo apt update
 sudo apt install git -y
 sudo apt install neovim -y
 sudo apt install yadm -y
+sudo apt install zsh -y
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 cd ~ 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
