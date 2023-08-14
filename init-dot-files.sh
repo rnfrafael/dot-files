@@ -15,7 +15,7 @@ git clone https://github.com/zsh-users/zsh-history-substring-search.git ~/.zsh/z
 git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ~/.zsh/zsh-you-should-use
 
 echo "[-] Download fonts [-]"
-sudo apt install fontconfig
+sudo apt install fontconfig -y
 # https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0?permalink_comment_id=4179773#gistcomment-4179773
 declare -a fonts=(
     BitstreamVeraSansMono
