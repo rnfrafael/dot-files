@@ -99,6 +99,8 @@ sudo apt update && sudo apt install 1password-cli
 echo "[-] Done install 1Password [-]"
 ######## END ########
 
-yadm clone https://github.com/rnfrafael/dot-files.git ~/
+yadm clone https://github.com/rnfrafael/dot-files.git
+sed -i '1iexec zsh' ~/.bashrc
+exec zsh
 
 # wget -O - https://raw.githubusercontent.com//rnfrafael/dot-files/main/init-dot-files.sh | bash
