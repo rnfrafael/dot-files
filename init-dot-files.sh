@@ -4,15 +4,84 @@ sudo apt update
 sudo apt install git -y
 sudo apt install neovim -y
 sudo apt install yadm -y
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 cd ~ 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 curl -fsSL https://fnm.vercel.app/install | bash # install FNM - Fast Node Manager
 #zsh Plugins
-git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/zsh
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/zsh
-git clone https://github.com/zsh-users/zsh-history-substring-search.git ~/zsh
-git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ~/zsh
+git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-history-substring-search.git ~/.zsh/zsh-history-substring-search
+git clone https://github.com/MichaelAquilina/zsh-you-should-use.git ~/.zsh/zsh-you-should-use
 
-yadm git clone https://github.com/rnfrafael/dot-files.git ~/
+echo "[-] Download fonts [-]"
+sudo apt install fontconfig
+# https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0?permalink_comment_id=4179773#gistcomment-4179773
+declare -a fonts=(
+    BitstreamVeraSansMono
+    CodeNewRoman
+    DroidSansMono
+    FiraCode
+    FiraMono
+    Go-Mono
+    Hack
+    Hermit
+    JetBrainsMono
+    Meslo
+    Noto
+    Overpass
+    ProggyClean
+    RobotoMono
+    SourceCodePro
+    SpaceMono
+    Ubuntu
+    UbuntuMono
+)
+
+version='2.1.0'
+fonts_dir="${HOME}/.local/share/fonts"
+
+if [[ ! -d "$fonts_dir" ]]; then
+    mkdir -p "$fonts_dir"
+fi
+
+for font in "${fonts[@]}"; do
+    zip_file="${font}.zip"
+    download_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/${zip_file}"
+    echo "Downloading $download_url"
+    wget "$download_url"
+    unzip "$zip_file" -d "$fonts_dir"
+    rm "$zip_file"
+done
+
+find "$fonts_dir" -name '*Windows Compatible*' -delete
+
+fc-cache -fv
+echo "[-] Done download fonts [-]"
+
+######## 1pass INIT ########
+echo "[-] Install 1Password [-]"
+curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" |
+sudo tee /etc/apt/sources.list.d/1password.list
+
+sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/
+
+curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol
+
+sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22
+
+curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg
+
+sudo apt update && sudo apt install 1password-cli
+
+echo "[-] Done install 1Password [-]"
+######## END ########
+
+yadm clone https://github.com/rnfrafael/dot-files.git ~/
 
 # wget -O - https://raw.githubusercontent.com//rnfrafael/dot-files/main/init-dot-files.sh | bash
