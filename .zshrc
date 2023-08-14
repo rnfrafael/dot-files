@@ -71,6 +71,7 @@ alias dvol="docker volume ls"
 alias dlogs="docker logs"
 alias dexec="docker exec"
 alias dexeca="docker exec -it"
+alias dco="docker-compose"
 
 # Editor-related aliases
 alias codez="code ~/.zshrc"
@@ -100,3 +101,11 @@ eval "`fnm env`"
 eval "$(op completion zsh)"; compdef _op op
 
 
+
+# pnpm
+export PNPM_HOME="/home/rnfrafael/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
