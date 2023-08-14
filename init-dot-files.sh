@@ -10,8 +10,9 @@ source ~/.bashrc
 
 ##NeoVim
 echo "[-] install NeoVim [-]"
-asdf plugin add neovim
-asdf install neovim 0.9.1
+sudo asdf plugin add neovim
+sudo asdf install neovim 0.9.1
+sudo asdf global neovim 0.9.1
 echo "[-] install Plug for nvim[-]"
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -100,7 +101,7 @@ echo "[-] Done install 1Password [-]"
 ######## END ########
 
 yadm clone https://github.com/rnfrafael/dot-files.git
-sed -i '1iexec zsh' ~/.bashrc
+#sed -i '1iexec zsh' ~/.bashrc
 exec zsh
 
 # wget -O - https://raw.githubusercontent.com//rnfrafael/dot-files/main/init-dot-files.sh | bash
