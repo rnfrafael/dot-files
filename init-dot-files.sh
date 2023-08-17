@@ -1,6 +1,21 @@
 #!bin/bash
 
+if ! command -v sudo &> /dev/null; then
+    echo "sudo command not found. Installing sudo..."
+    if command -v apt &> /dev/null; then
+        # Install sudo using apt
+        sudo apt update
+        sudo apt install -y sudo
+        echo "sudo has been installed."
+    else
+        echo "apt command not found. Please install sudo manually."
+    fi
+else
+    echo "sudo is already installed."
+fi
+
 sudo apt update
+sudo apt install unzip -y
 sudo apt install git -y
 sudo apt install yadm -y
 sudo apt install zsh -y
@@ -8,11 +23,18 @@ git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
 source ~/.bashrc
 
+##Node
+echo "[-] install Node [-]"
+asdf plugin add nodejs
+asdf install nodejs latest:18
+asdf global nodejs latest:18
+echo "[-] Done Node [-]"
+
 ##NeoVim
 echo "[-] install NeoVim [-]"
-sudo asdf plugin add neovim
-sudo asdf install neovim 0.9.1
-sudo asdf global neovim 0.9.1
+asdf plugin add neovim
+asdf install neovim 0.9.1
+asdf global neovim 0.9.1
 echo "[-] install Plug for nvim[-]"
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
