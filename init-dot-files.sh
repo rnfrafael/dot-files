@@ -15,20 +15,27 @@ else
 fi
 
 sudo apt update
-sudo apt install unzip -y
-sudo apt install git -y
-sudo apt install yadm -y
-sudo apt install zsh -y
+# Packages to install
+PACKAGES=(
+    "unzip"
+    "wget"
+    "git"
+    "yadm"
+    "zsh"
+)
+for package in "${PACKAGES[@]}"; do
+    sudo apt install -y "$package"
+done
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
 source ~/.bashrc
 
-##Node
-echo "[-] install Node [-]"
-asdf plugin add nodejs
-asdf install nodejs latest:18
-asdf global nodejs latest:18
-echo "[-] Done Node [-]"
+# ##Node
+# echo "[-] install Node [-]"
+# asdf plugin add nodejs
+# asdf install nodejs latest:18
+# asdf global nodejs latest:18
+# echo "[-] Done Node [-]"
 
 ##NeoVim
 echo "[-] install NeoVim [-]"
@@ -45,6 +52,8 @@ echo "[-] Done NeoVim [-]"
 cd ~ 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 curl -fsSL https://fnm.vercel.app/install | bash # install FNM - Fast Node Manager
+source ~/.bashrc
+fnm install --lts
 #zsh Plugins
 git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.zsh/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
@@ -58,24 +67,24 @@ echo "[-] Download fonts [-]"
 sudo apt install fontconfig -y
 # https://gist.github.com/matthewjberger/7dd7e079f282f8138a9dc3b045ebefa0?permalink_comment_id=4179773#gistcomment-4179773
 declare -a fonts=(
-    BitstreamVeraSansMono
-    CodeNewRoman
-    DroidSansMono
-    FiraCode
+    #BitstreamVeraSansMono
+    #CodeNewRoman
+    #DroidSansMono
+    #FiraCode
     FiraMono
-    Go-Mono
-    Hack
-    Hermit
-    JetBrainsMono
-    Meslo
-    Noto
-    Overpass
-    ProggyClean
-    RobotoMono
-    SourceCodePro
-    SpaceMono
-    Ubuntu
-    UbuntuMono
+    #Go-Mono
+    #Hack
+    #Hermit
+    #JetBrainsMono
+    #Meslo
+    #Noto
+    #Overpass
+    #ProggyClean
+    #RobotoMono
+    #SourceCodePro
+    #SpaceMono
+    #Ubuntu
+    #UbuntuMono
 )
 
 version='2.1.0'
@@ -124,6 +133,11 @@ echo "[-] Done install 1Password [-]"
 
 yadm clone https://github.com/rnfrafael/dot-files.git
 #sed -i '1iexec zsh' ~/.bashrc
+# Run Neovim and execute the PlugInstall command
+nvim --headless -c ":PlugInstall" -c ":qa"
+
+sudo chsh -s $(which zsh)
 exec zsh
+sudo apt upgrade -y
 
 # wget -O - https://raw.githubusercontent.com//rnfrafael/dot-files/main/init-dot-files.sh | bash
