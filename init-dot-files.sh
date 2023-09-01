@@ -30,13 +30,6 @@ git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
 source ~/.bashrc
 
-# ##Node
-# echo "[-] install Node [-]"
-# asdf plugin add nodejs
-# asdf install nodejs latest:18
-# asdf global nodejs latest:18
-# echo "[-] Done Node [-]"
-
 ##NeoVim
 echo "[-] install NeoVim [-]"
 asdf plugin add neovim
@@ -45,9 +38,16 @@ asdf global neovim 0.9.1
 echo "[-] install Plug for nvim[-]"
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-#sudo apt install neovim -y
-#should run :PlugInstall inside NeoVim
 echo "[-] Done NeoVim [-]"
+
+
+##LazyDocker and Docker
+#echo "[-] install LazyDocker [-]"
+#asdf plugin add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git
+#asdf list all lazydocker
+#asdf install lazydocker latest
+#asdf global lazydocker latest
+#echo "[-] Done LazyDocker [-]"
 
 cd ~ 
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
