@@ -71,11 +71,11 @@ sleep 2
 # Install FNM - Fast Node Manager
 echo "[----] Installing FNM [----]"
 curl -fsSL https://fnm.vercel.app/install | bash
+source ~/.bashrc
 if ! command -v fnm &> /dev/null; then
     echo "Error: FNM installation failed or not found."
     exit 1
 fi
-source ~/.bashrc
 echo "[----] FNM installed [----]"
 sleep 2
 
@@ -192,7 +192,7 @@ yadm clone https://github.com/rnfrafael/dot-files.git
 nvim --headless -c ":PlugInstall" -c ":qa"
 
 # Switch to zsh
-sudo chsh -s $(which zsh)
+chsh -s $(which zsh)
 exec zsh
 sudo apt upgrade -y
 
