@@ -57,6 +57,7 @@ sleep 2
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
 source ~/.bashrc
+source "$HOME/.asdf/asdf.sh"
 echo "[----] asdf cloned and added to bashrc [----]"
 sleep 2
 
@@ -72,6 +73,8 @@ sleep 2
 echo "[----] Installing FNM [----]"
 curl -fsSL https://fnm.vercel.app/install | bash
 source ~/.bashrc
+export PATH="/root/.local/share/fnm:$PATH"
+eval "$(fnm env)"
 if ! command -v fnm &> /dev/null; then
     echo "Error: FNM installation failed or not found."
     exit 1
