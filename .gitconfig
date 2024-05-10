@@ -1,0 +1,16 @@
+[user]
+  name = rnfrafael
+  email = rnf.rafael@gmail.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKMk/oRo3NSMIlXlz0Uhyc+44eosL+RfAYTryGHwqAOA
+[core]
+	sshCommand = ssh.exe
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/mnt/c/Users/Rafonte/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+
+[commit]
+  gpgsign = true
+
+[init]
+  defaultBranch = main
