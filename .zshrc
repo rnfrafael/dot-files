@@ -6,10 +6,9 @@ fi
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
+fpath=(~/.zsh_functions $fpath)
 . "$HOME/.asdf/asdf.sh"
 # append completions to fpath
-fpath=(${ASDF_DIR}/completions $fpath)
 # initialise completions with ZSH's compinit
 autoload -Uz compinit && compinit
 
@@ -40,7 +39,7 @@ ignorespace=('ls' 'cd')
 # Save each command as it is entered, rather than at the end of the session
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
-
+source ~/.zsh_functions
 
 
 # Key bindings for moving cursor within a line
@@ -96,8 +95,6 @@ alias update-nvim-master='asdf uninstall neovim ref:master && asdf install neovi
 
 ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(/mnt/c)
 # fnm
-export PATH="/home/rnfrafael/.local/share/fnm:$PATH"
-eval "`fnm env`"
 eval "$(op completion zsh)"; compdef _op op
 
 
@@ -109,3 +106,10 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# bun completions
+[ -s "/root/.bun/_bun" ] && source "/root/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
