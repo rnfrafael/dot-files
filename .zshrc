@@ -6,7 +6,13 @@ fi
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+<<<<<<< Updated upstream
 fpath=(~/.zsh_functions $fpath)
+=======
+
+alias z=zellij
+
+>>>>>>> Stashed changes
 . "$HOME/.asdf/asdf.sh"
 # append completions to fpath
 # initialise completions with ZSH's compinit
@@ -41,6 +47,10 @@ PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
 source ~/.zsh_functions
 
+##SSH ALIAS
+alias ssh='ssh.exe'
+alias ssh-add='ssh-add.exe'
+>>>>>>> Stashed changes
 
 # Key bindings for moving cursor within a line
 bindkey '^a' beginning-of-line       # Ctrl + A - Move cursor to beginning of line
@@ -63,13 +73,7 @@ alias cfltrun="cloudflared tunnel run"
 alias cflroute="cloudflared tunnel route dns"
 
 # Docker aliases
-alias dps="docker ps"
-alias dpsa="docker ps -a"
-alias drm="docker rm"
-alias dvol="docker volume ls"
-alias dlogs="docker logs"
-alias dexec="docker exec"
-alias dexeca="docker exec -it"
+alias d="docker"
 alias dco="docker-compose"
 
 # Editor-related aliases
@@ -80,7 +84,7 @@ alias nvcoc="nvim ~/.config/nvim/coc-settings.json"
 
 # Directory-related aliases
 alias winwww="cd /mnt/c/www"
-alias workl="cd /home/rnfrafael/www/workana"
+alias wsconf="vim /mnt/c/Users/Rafonte/.ssh/config"
 
 # List-related aliases
 alias ll="ls -l"
@@ -89,7 +93,7 @@ alias lla="ls -la"
 alias ls="ls --color=auto"
 
 # nvim aliases with asdf package
-alias update-nvim-stable='asdf uninstall neovim stable && asdf install neovim stable'
+alias update-nvim='asdf uninstall neovim stable && asdf install neovim stable'
 alias update-nvim-nightly='asdf uninstall neovim nightly && asdf install neovim nightly'
 alias update-nvim-master='asdf uninstall neovim ref:master && asdf install neovim ref:master'
 
@@ -97,7 +101,7 @@ ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(/mnt/c)
 # fnm
 eval "$(op completion zsh)"; compdef _op op
 
-
+export PATH="$PATH:/snap/bin"
 
 # pnpm
 export PNPM_HOME="/home/rnfrafael/.local/share/pnpm"
@@ -108,7 +112,11 @@ esac
 # pnpm end
 
 # bun completions
+<<<<<<< Updated upstream
 [ -s "/root/.bun/_bun" ] && source "/root/.bun/_bun"
+=======
+[ -s "/home/rnfrafael/.bun/_bun" ] && source "/home/rnfrafael/.bun/_bun"
+>>>>>>> Stashed changes
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
