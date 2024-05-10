@@ -1,0 +1,5 @@
+find_large_files() {
+    local size=$1
+    sudo find / -type f -size +${size}M -exec ls -lh {} \;
+}
+
