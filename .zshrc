@@ -6,13 +6,9 @@ fi
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-<<<<<<< Updated upstream
-fpath=(~/.zsh_functions $fpath)
-=======
 
 alias z=zellij
 
->>>>>>> Stashed changes
 . "$HOME/.asdf/asdf.sh"
 # append completions to fpath
 # initialise completions with ZSH's compinit
@@ -50,7 +46,6 @@ source ~/.zsh_functions
 ##SSH ALIAS
 alias ssh='ssh.exe'
 alias ssh-add='ssh-add.exe'
->>>>>>> Stashed changes
 
 # Key bindings for moving cursor within a line
 bindkey '^a' beginning-of-line       # Ctrl + A - Move cursor to beginning of line
@@ -98,7 +93,9 @@ alias update-nvim-nightly='asdf uninstall neovim nightly && asdf install neovim 
 alias update-nvim-master='asdf uninstall neovim ref:master && asdf install neovim ref:master'
 
 ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(/mnt/c)
-# fnm
+
+export PATH="$HOME/.local/share/fnm:$PATH"
+eval "`fnm env`"
 eval "$(op completion zsh)"; compdef _op op
 
 export PATH="$PATH:/snap/bin"
@@ -112,11 +109,8 @@ esac
 # pnpm end
 
 # bun completions
-<<<<<<< Updated upstream
 [ -s "/root/.bun/_bun" ] && source "/root/.bun/_bun"
-=======
 [ -s "/home/rnfrafael/.bun/_bun" ] && source "/home/rnfrafael/.bun/_bun"
->>>>>>> Stashed changes
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

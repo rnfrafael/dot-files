@@ -3,3 +3,16 @@ find_large_files() {
     sudo find / -type f -size +${size}M -exec ls -lh {} \;
 }
 
+create_swap() {
+    local size=$1
+    sudo fallocate -l ${size}G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo "/swapfile swap defaults 0 0" | sudo tee -a /etc/fstab
+}
+
+remove_large_files() {
+    local size=$1
+    sudo find / -type f -size +${size}M -exec rm {} \;
+}
