@@ -8,6 +8,8 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 alias z=zellij
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
 
 . "$HOME/.asdf/asdf.sh"
 # append completions to fpath
@@ -21,7 +23,8 @@ source ~/.zsh/zsh-you-should-use/zsh-you-should-use.plugin.zsh
 
 export PATH="/home/rnfrafael/.mscripts:$PATH"
 export PATH="/mnt/c/Users/rnfra/AppData/Local/Programs/Microsoft VS Code/bin:$PATH"
-
+export PATH="/mnt/c/Users/rnfra/AppData/Local/Programs/cursor/resources/app/bin:$PATH"
+export PATH="/home/rnfrafael/www/notifique/flutter/flutter/bin:$PATH"
 # Specify the location where command history will be saved
 HISTFILE="$HOME/.zsh_history"
 # Increase the maximum number of commands stored in the history file
@@ -79,7 +82,7 @@ alias nvcoc="nvim ~/.config/nvim/coc-settings.json"
 
 # Directory-related aliases
 alias winwww="cd /mnt/c/www"
-alias wsconf="vim /mnt/c/Users/Rafonte/.ssh/config"
+alias wsconf="nvim /mnt/c/Users/Rafonte/.ssh/config"
 
 # List-related aliases
 alias ll="ls -l"
@@ -115,3 +118,86 @@ esac
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Turso
+export PATH="/home/rnfrafael/.turso:$PATH"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+PATH=~/.console-ninja/.bin:$PATH
+# Generate commit message for unstaged changes
+ccm() {
+    git diff | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation."
+}
+
+# Generate commit message for staged changes
+ccm_staged() {
+    git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation."
+}
+
+# Generate commit message and explanation for unstaged changes
+ccm_explain() {
+    git diff | cody chat --stdin -m "Analyze this diff and provide: 1) A conventional commit message 2) A detailed explanation of the changes. Format as 'message: explanation'"
+}
+
+# Generate message and auto-commit staged changes
+ccm_auto() {
+    local message=$(git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation.")
+    echo "Committing with message: $message"
+    git commit -m "$message"
+}
+
+# Generate message for a specific file
+ccm_file() {
+    if [ -z "$1" ]; then
+        echo "Usage: ccm_file <file_path>"
+        return 1
+    fi
+    git diff "$1" | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation."
+}
+
+# Analyze impact of changes and generate detailed commit
+ccm_analyze() {
+    echo "🔍 Analyzing changes..."
+    git diff --cached | cody chat --stdin -m "Analyze this diff and provide:
+    1) A conventional commit message
+    2) Impact analysis (what parts of the system are affected)
+    3) Breaking changes (if any)
+    4) Testing recommendations
+    Format as 'message|impact|breaking|testing' using | as separator"
+}
+
+# Interactive commit helper
+ccm_interactive() {
+    echo "📝 Generating commit suggestions..."
+    local message=$(git diff --cached | cody chat --stdin -m "Write 3 alternative conventional commit messages for this diff, number them 1-3")
+    
+    echo "Choose a commit message or type your own:"
+    echo "$message"
+    echo "4) Enter custom message"
+    
+    read -p "Select option (1-4): " choice
+    
+    if [ "$choice" = "4" ]; then
+        read -p "Enter your commit message: " custom_message
+        git commit -m "$custom_message"
+    elif [ "$choice" -ge 1 ] && [ "$choice" -le 3 ]; then
+        local selected_message=$(echo "$message" | grep "^$choice" | sed "s/^$choice) //")
+        git commit -m "$selected_message"
+    else
+        echo "Invalid choice"
+        return 1
+    fi
+}
+
+# Brief help function
+ccm_help() {
+    echo "Git Commit Message Helper Commands:"
+    echo "ccm              - Generate commit message for unstaged changes"
+    echo "ccm_staged      - Generate commit message for staged changes"
+    echo "ccm_explain     - Generate commit message with detailed explanation"
+    echo "ccm_auto        - Auto-commit staged changes with generated message"
+    echo "ccm_file <path> - Generate commit message for specific file"
+    echo "ccm_analyze     - Detailed analysis of staged changes"
+    echo "ccm_interactive - Interactive commit message selection"
+}
