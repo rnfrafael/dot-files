@@ -1,25 +1,42 @@
+# Enable Powerlevel10k instant prompt (put this at the very top of .zshrc)
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zshsource ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# Silence the warning message
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
+# Load theme (fix the duplicate entries you currently have)
 source ~/powerlevel10k/powerlevel10k.zsh-theme
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+
+# Load p10k config
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-alias z=zellij
+alias zl='zellij'
 alias pbcopy='xsel --clipboard --input'
 alias pbpaste='xsel --clipboard --output'
 
+alias lz='lazygit'
+
+alias c.='cursor .'
+
 . "$HOME/.asdf/asdf.sh"
 # append completions to fpath
-# initialise completions with ZSH's compinit
-autoload -Uz compinit && compinit
 
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
-source ~/.zsh/zsh-you-should-use/zsh-you-should-use.plugin.zsh
+
+
+# Download and source zsh-defer
+[[ -f ~/.zsh-defer/zsh-defer.plugin.zsh ]] || {
+  mkdir -p ~/.zsh-defer
+  curl -L https://raw.githubusercontent.com/romkatv/zsh-defer/master/zsh-defer.plugin.zsh >~/.zsh-defer/zsh-defer.plugin.zsh
+}
+source ~/.zsh-defer/zsh-defer.plugin.zsh
+
+# Defer loading of slow plugins
+zsh-defer source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+zsh-defer source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+zsh-defer source ~/.zsh/zsh-you-should-use/zsh-you-should-use.plugin.zsh
+zsh-defer source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/home/rnfrafael/.mscripts:$PATH"
 export PATH="/mnt/c/Users/rnfra/AppData/Local/Programs/Microsoft VS Code/bin:$PATH"
@@ -90,11 +107,6 @@ alias la="ls -a"
 alias lla="ls -la"
 alias ls="ls --color=auto"
 
-# nvim aliases with asdf package
-alias update-nvim='asdf uninstall neovim stable && asdf install neovim stable'
-alias update-nvim-nightly='asdf uninstall neovim nightly && asdf install neovim nightly'
-alias update-nvim-master='asdf uninstall neovim ref:master && asdf install neovim ref:master'
-
 ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(/mnt/c)
 
 export PATH="$HOME/.local/share/fnm:$PATH"
@@ -124,15 +136,15 @@ export PATH="/home/rnfrafael/.turso:$PATH"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-PATH=~/.console-ninja/.bin:$PATH
+
 # Generate commit message for unstaged changes
 ccm() {
-    git diff | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation."
+    git diff | cody chat --stdin -m "Write a commit message for this diff using conventional commits, return a symary from all files inside a commit message, use the title and add description too"
 }
 
 # Generate commit message for staged changes
 ccm_staged() {
-    git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation."
+    git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, return a sumary from all files inside a commit message, use the title and add description too"
 }
 
 # Generate commit message and explanation for unstaged changes
@@ -142,7 +154,7 @@ ccm_explain() {
 
 # Generate message and auto-commit staged changes
 ccm_auto() {
-    local message=$(git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, show only the message without any explanation.")
+    local message=$(git diff --cached | cody chat --stdin -m "Write a commit message for this diff using conventional commits, return a sumary from all files inside a commit message, use the title and add description too this message will be used as commit automatically, so just show the commit message without any extra text.")
     echo "Committing with message: $message"
     git commit -m "$message"
 }
@@ -167,27 +179,55 @@ ccm_analyze() {
     Format as 'message|impact|breaking|testing' using | as separator"
 }
 
-# Interactive commit helper
+# Interactive commit helper with fixed read command and diff handling
 ccm_interactive() {
     echo "📝 Generating commit suggestions..."
-    local message=$(git diff --cached | cody chat --stdin -m "Write 3 alternative conventional commit messages for this diff, number them 1-3")
+    
+    # Check if there are staged changes
+    if ! git diff --cached --quiet; then
+        local message=$(git diff --cached | cody chat --stdin -m "Write 3 alternative conventional commit messages for this diff, number them 1-3")
+    else
+        # If no staged changes, check unstaged changes
+        if ! git diff --quiet; then
+            local message=$(git diff | cody chat --stdin -m "Write 3 alternative conventional commit messages for this diff, number them 1-3")
+        else
+            echo "No changes detected (staged or unstaged)"
+            return 1
+        fi
+    fi
     
     echo "Choose a commit message or type your own:"
     echo "$message"
     echo "4) Enter custom message"
     
-    read -p "Select option (1-4): " choice
+    # Fixed read command
+    read choice
     
-    if [ "$choice" = "4" ]; then
-        read -p "Enter your commit message: " custom_message
-        git commit -m "$custom_message"
-    elif [ "$choice" -ge 1 ] && [ "$choice" -le 3 ]; then
-        local selected_message=$(echo "$message" | grep "^$choice" | sed "s/^$choice) //")
-        git commit -m "$selected_message"
-    else
-        echo "Invalid choice"
-        return 1
-    fi
+    case "$choice" in
+        1|2|3)
+            local selected_message=$(echo "$message" | grep "^$choice" | sed "s/^$choice) //")
+            if [ -n "$selected_message" ]; then
+                git commit -m "$selected_message"
+            else
+                echo "Failed to extract message"
+                return 1
+            fi
+            ;;
+        4)
+            echo "Enter your commit message:"
+            read custom_message
+            if [ -n "$custom_message" ]; then
+                git commit -m "$custom_message"
+            else
+                echo "No message provided"
+                return 1
+            fi
+            ;;
+        *)
+            echo "Invalid choice"
+            return 1
+            ;;
+    esac
 }
 
 # Brief help function
@@ -201,3 +241,141 @@ ccm_help() {
     echo "ccm_analyze     - Detailed analysis of staged changes"
     echo "ccm_interactive - Interactive commit message selection"
 }
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH="$PATH:/usr/local/bin"
+export PATH="$PATH:$HOME/.local/bin"
+alias podman='podman-remote-static-linux_amd64'
+alias apksigner='~/Android/Sdk/build-tools/34.0.0/apksigner'
+
+eval "$(zoxide init zsh)"
+
+gh_create_issue() {
+    echo "Creating a new GitHub issue..."
+    
+    # Ask for the main goal of the issue
+    echo -n "What's the main goal of this issue? "
+    read main_goal
+    
+    # Ask for description
+    echo -n "Provide a description (press Enter, then Ctrl+D when finished): "
+    description=$(cat)
+    
+    # Ask for any important data
+    echo -n "Any important data to include? (press Enter, then Ctrl+D when finished): "
+    important_data=$(cat)
+    
+    # Combine all collected data
+    collected_data="Main goal: $main_goal
+
+Description:
+$description
+
+Important data:
+$important_data"
+    
+ # Generate the issue content using Cody
+    echo "Generating issue content with AI..."
+    
+    # Use a temporary file to store the AI-generated content
+    temp_file=$(mktemp)
+    
+    # Request the AI to generate both title and body
+    cody chat -m "Write a GitHub issue with a title and body using this information as base: $collected_data. Format your response with first line as the title, then a blank line, then the markdown body. Make sure the title is specific and descriptive." > "$temp_file"
+    
+    # Extract the first line as title and the rest as body
+    issue_title=$(head -n 1 "$temp_file")
+    issue_body=$(tail -n +3 "$temp_file")
+    
+    # Ensure we have a title
+    if [ -z "$issue_title" ]; then
+        issue_title="$main_goal"
+    fi
+    
+    # Create the issue using GitHub CLI
+    echo "Creating issue with title: $issue_title"
+    gh issue create --title "$issue_title" --body "$issue_body"
+    
+    # Clean up
+    rm "$temp_file"
+    
+    echo "Issue created successfully!"
+
+}
+
+gh_ci_node() {
+    echo "Creating a new GitHub issue..."
+    
+    # Project context information
+    project_context="This is a Node.js/TypeScript project. Consider TypeScript syntax and Node.js environment when providing solutions."
+    
+    # Ask for the main goal of the issue
+    echo -n "What's the main goal of this issue? "
+    read main_goal
+    
+    # Ask for description
+    echo -n "Provide a description (press Enter, then Ctrl+D when finished): "
+    description=$(cat)
+    
+    # Ask for any important data
+    echo -n "Any important data to include? (press Enter, then Ctrl+D when finished): "
+    important_data=$(cat)
+    
+    # Ask for specific technologies related to this issue
+    echo -n "Any specific technologies/libraries used for this issue? (e.g., Express, React, etc.): "
+    read specific_tech
+    
+    # Combine all collected data with proper context
+    collected_data="$project_context
+
+Main goal: $main_goal
+
+Description:
+$description
+
+Technologies: Node.js, TypeScript, $specific_tech
+
+Important data:
+$important_data"
+    
+    # Generate the issue content using Cody
+    echo "Generating issue content with AI..."
+    
+    # Use a temporary file to store the AI-generated content
+    temp_file=$(mktemp)
+    
+    # Request the AI to generate both title and body with proper context
+    cody chat -m "Write a GitHub issue for a Node.js/TypeScript project with a title and body using this information as base: $collected_data. The issue should be written with TypeScript/Node.js context in mind. Format your response with first line as the title, then a blank line, then the markdown body. Make sure the title is specific and descriptive. Include any TypeScript/Node.js specific considerations in the body." > "$temp_file"
+    
+    # Extract the first line as title and the rest as body
+    issue_title=$(head -n 1 "$temp_file")
+    issue_body=$(tail -n +3 "$temp_file")
+    
+    # Ensure we have a title
+    if [ -z "$issue_title" ]; then
+        issue_title="$main_goal"
+    fi
+    
+    # Create the issue using GitHub CLI
+    echo "Creating issue with title: $issue_title"
+    gh issue create --title "$issue_title" --body "$issue_body"
+    
+    # Clean up
+    rm "$temp_file"
+    
+    echo "Issue created successfully!"
+}
+
+autoload -Uz compinit
+#if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+#if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+#if [[ -f ${ZDOTDIR:=$HOME}/.zcompdump && $(date +%s) - $(stat -c %Y ${ZDOTDIR}/.zcompdump) -gt 86400 ]]; then
+if [[ -f ${ZDOTDIR:=$HOME}/.zcompdump(Nm-24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
